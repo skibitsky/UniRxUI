@@ -5,22 +5,27 @@ namespace Skibitsky.UniRxUI.Example
 {
     public class Launcher : MonoBehaviour
     {
-        [SerializeField] private DropdownView dropdownView;
-        [SerializeField] private TextView textView;
+        // Assume this is our model :)
+        private readonly IReactiveProperty<int> _points = new ReactiveProperty<int>();
+        private int _pointsAddendum = 1;
+        
         private void Start()
         {
-            // Init text
-            var text = new TextPresenter();
-            textView.Initialise(text);
-            
-            // Init dropdown
-            var dropdown = new DropdownPresenter();
-            dropdownView.Initialise(dropdown);
+            // Get reference to the view (you can do this with DI or SerializeField)
+            var pointsView = FindObjectOfType<ReactiveView<IPointsPresenter>>();
+            // Create Points Presenter and pass our model's properties to it
+            var pointsPresenter = new PointsPresenter(_points);
+            // Initialise view with our presenter
+            pointsView.Initialise(pointsPresenter);
 
-            // Bind text to dropdown index change
-            dropdown.ValueChanged
-                .Subscribe(v => text.Text.Value = $"Dropdown index: {v.ToString()}")
+            var addendumView = FindObjectOfType<ReactiveView<IAddendumPresenter>>();
+            var addendumPresenter = new AddendumPresenter();
+            addendumView.Initialise(addendumPresenter);
+            addendumPresenter.AddendumChanged
+                .Select(int.Parse)
+                .Subscribe(i => _pointsAddendum = i)
                 .AddTo(gameObject);
+
         }
     }
 }

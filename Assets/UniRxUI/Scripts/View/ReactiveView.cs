@@ -8,7 +8,7 @@ namespace Skibitsky.UniRxUI
         protected RectTransform Transform;
         public T Presenter { get; set; }
 
-        private void Awake()
+        protected virtual void Awake()
         {
             Transform = GetComponent<RectTransform>();
         }
